@@ -6,7 +6,14 @@ import PropTypes from "prop-types";
 import CourseForm from "./CourseForm";
 import { newCourse } from "../../../tools/mockData";
 
-function ManageCoursePage({ courses, authors, loadAuthors, loadCourses, ...props }) {
+export function ManageCoursePage({ 
+    courses,
+    authors, 
+    loadAuthors, 
+    loadCourses, 
+    saveCourse, 
+    ...props 
+}) {
     const [ course, setCourse ] = useState({...props.course});
     const [ errors, setErrors ] = useState({});
     
@@ -24,7 +31,28 @@ function ManageCoursePage({ courses, authors, loadAuthors, loadCourses, ...props
         }
     }, [])
 
-    return <CourseForm course={course} errors={errors} authors={authors} />
+    function handleChange(event) {
+        const { name, value } = event.target;
+        setCourse(prevCourse => ({
+            ...prevCourse,
+            [name]: name === "authorId" ? parseInt(value, 10) : value
+        }));
+    }
+
+    function handleSave(event) {
+        event.preventDefault();
+        saveCourse(course);
+    }
+
+    return (
+        <CourseForm 
+            course={course} 
+            errors={errors} 
+            authors={authors} 
+            onChange={handleChange} 
+            onSave={handleSave}
+        />
+    );
 }
 
 ManageCoursePage.propTypes = {
@@ -33,6 +61,7 @@ ManageCoursePage.propTypes = {
     courses: PropTypes.array.isRequired,
     loadCourses: PropTypes.func.isRequired,
     loadAuthors: PropTypes.func.isRequired,
+    saveCourse: PropTypes.func.isRequired,
 }
 
 function mapStateToProps(state) {
@@ -45,7 +74,8 @@ function mapStateToProps(state) {
 
 const mapDispatchToProps = {
     loadCourses: courseActions.loadCourses,
-    loadAuthors: authorActions.loadAuthors
+    loadAuthors: authorActions.loadAuthors,
+    saveCourse: courseActions.saveCourse,
 
 }
 
