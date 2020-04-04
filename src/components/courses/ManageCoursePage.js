@@ -6,15 +6,17 @@ import PropTypes from "prop-types";
 import CourseForm from "./CourseForm";
 import { newCourse } from "../../../tools/mockData";
 
-export function ManageCoursePage({ 
+function ManageCoursePage({ 
     courses,
     authors, 
     loadAuthors, 
     loadCourses, 
     saveCourse, 
+    history,
     ...props 
 }) {
-    const [ course, setCourse ] = useState({...props.course});
+    const [ course, setCourse ] = useState( {...props.course} );
+    // eslint-disable-next-line no-unused-vars
     const [ errors, setErrors ] = useState({});
     
     useEffect(() => {
@@ -22,6 +24,8 @@ export function ManageCoursePage({
             loadCourses().catch(error => {
                 alert("Loading courses failed" + error);
             })
+        } else {
+            setCourse({ ...props.course });
         }
 
         if (authors.length === 0) {
@@ -29,7 +33,7 @@ export function ManageCoursePage({
                 alert("Loading authors failed" + error);
             })
         }
-    }, [])
+    }, [props.course, authors, courses, loadAuthors, loadCourses])
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -41,7 +45,9 @@ export function ManageCoursePage({
 
     function handleSave(event) {
         event.preventDefault();
-        saveCourse(course);
+        saveCourse(course).then(() => {
+            history.push("/courses");
+        });
     }
 
     return (
@@ -62,11 +68,23 @@ ManageCoursePage.propTypes = {
     loadCourses: PropTypes.func.isRequired,
     loadAuthors: PropTypes.func.isRequired,
     saveCourse: PropTypes.func.isRequired,
+    history: PropTypes.object.isRequired,
+};
+
+export function getCourseBySlug(courses, slug) {
+    return courses.find(course => course.slug === slug) || null;
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
+    const slug = ownProps.match.params.slug;
+    debugger
+    const course =
+    slug && state.courses.length > 0
+    ? getCourseBySlug(state.courses, slug) 
+    : newCourse;
+
     return {
-        course: newCourse,
+        course: course,
         courses: state.courses,
         authors: state.authors
     }
