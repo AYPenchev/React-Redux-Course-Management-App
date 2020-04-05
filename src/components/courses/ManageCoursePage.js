@@ -33,7 +33,7 @@ function ManageCoursePage({
                 alert("Loading authors failed" + error);
             })
         }
-    }, [props.course, authors, courses, loadAuthors, loadCourses])
+    }, [props.course])
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -79,9 +79,9 @@ function mapStateToProps(state, ownProps) {
     const slug = ownProps.match.params.slug;
     debugger
     const course =
-    slug && state.courses.length > 0
-    ? getCourseBySlug(state.courses, slug) 
-    : newCourse;
+        slug && state.courses.length > 0
+            ? getCourseBySlug(state.courses, slug) 
+            : newCourse;
 
     return {
         course: course,
